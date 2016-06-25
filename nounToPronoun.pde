@@ -11,8 +11,8 @@ String[] adjustGrammar(String[] sentences) {
     str = str.replaceAll("n't ", " nOt ");
 
     /// nouns
-    str = replacePos(str, "(?:jj|nn|vbn)+ cc (?:jj|nn|vbn)+ KEY", "RM RM RM KEY");
-    str = replacePos(str, "(?:jj|nn)+ KEY", "RM KEY");
+    str = replacePos(str, "(?:jj|vbn)+ cc (?:jj|nn|vbn)+ KEY", "RM RM RM KEY");
+    str = replacePos(str, "(?:jj|nn|vbn)+ KEY", "RM KEY");
     str = replacePos(str, "KEY nn+ (?!rb)", "KEY RM (?!rb)");
     str = replacePos(str, "KEY nn $", "KEY RM $");
     str = replacePos(str, "KEY vb[ng] (?:vb|nn) vbg*", "KEY RM RM RM");

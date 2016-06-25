@@ -12,6 +12,7 @@ String[] loadHtml(String[] urls) {
       try {
         URL url = new URL(urls[i]);
         URLConnection conn = url.openConnection();
+        conn.setConnectTimeout(1000);
         conn.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:25.0) Gecko/20100101 Firefox/25.0");
         InputStreamReader in = new InputStreamReader(conn.getInputStream(), "UTF-8");
         BufferedReader br = new BufferedReader(in);

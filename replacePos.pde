@@ -14,19 +14,24 @@ String replacePos(String sentence, String find, String replace) {
     section = trim(section);
     for (int i = 0; i < section.length; i++) {
       if (match(section[i], keyRegex) != null) {
-        String[] strList = getFind(section[i], find);
-        String findStr = "";
-        for (int j = 0; j < strList.length; j++) {
-          findStr += strList[j] + " ";
-        }
-        findStr = findStr.trim();
-        findStr = findStr.replaceAll("  ", " ");
-        if (findStr != "") {
-          String replaceStr = getReplace(strList, findList, replaceList);
-          replaceStr = replaceStr.replaceAll("  ", " ");
-          if (replaceStr != "") {
-            String newSection = section[i].replaceAll(findStr, replaceStr);
-            sentence = sentence.replaceAll(section[i], newSection);
+        String[][] strList = getFind(section[i], find);
+        if (strList != null) {
+          for (int x = 0; x < strList.length; x++) {
+            String findStr = "";
+            for (int j = 1; j < strList[x].length; j++) {
+              findStr += strList[x][j] + " ";
+            }
+            findStr = findStr.trim();
+            findStr = findStr.replaceAll("  ", " ");
+            if (findStr != "") {
+              String replaceStr = getReplace(strList[x], findList, replaceList);
+              replaceStr = replaceStr.replaceAll("  ", " ");
+              if (replaceStr != "") {
+                String newSection = section[i].replaceAll(findStr, replaceStr);
+                sentence = sentence.replaceAll(section[i], newSection);
+                section[i] = newSection;
+              }
+            }
           }
         }
       }
@@ -35,20 +40,21 @@ String replacePos(String sentence, String find, String replace) {
   return sentence;
 }
 
-String[] getFind(String section, String find) {
+String[][] getFind(String section, String find) {
   String posInline = RiTa.getPosTagsInline(section);
   posInline += " ";
   String regex = posRegex(find);
   String[][] captureWords = matchAll(posInline, regex);
-  StringList strList = new StringList();
   if (captureWords != null) {
-    for (int i = 1; i < captureWords[0].length; i++) {
-      captureWords[0][i] = captureWords[0][i].replaceAll("/[^ ]* ", " ");
-      captureWords[0][i] = captureWords[0][i].trim();
-      strList.append(captureWords[0][i]);
+    for (int i = 0; i < captureWords.length; i++) {
+      for (int j = 1; j < captureWords[0].length; j++) {
+        captureWords[i][j] = captureWords[i][j].replaceAll("/[^ ]* ", " ");
+        captureWords[i][j] = captureWords[i][j].trim();
+      }
     }
+    return captureWords;
   }
-  return strList.array();
+  return null;
 }
 
 String posRegex(String pos) {
@@ -88,18 +94,18 @@ String getReplace(String strList[], String[] findList, String[] replaceList) {
   String replaceStr = "";
   for (int i = 0; i < findList.length; i++) {
     if (findList[i].contains("KEY") && replaceList[i].contains("KEY")) {
-      replaceStr += replaceList[i].replaceAll("KEY", strList[i]).replaceAll("_", " ") + " ";
+      replaceStr += replaceList[i].replaceAll("KEY", strList[i+1]).replaceAll("_", " ") + " ";
     } else if (replaceList[i].equals("RM")) {
       //
     } else if (replaceList[i].equals(".+") || replaceList[i].equals(".*") || replaceList[i].equals(".")) {
-      replaceStr += strList[i] + " ";
+      replaceStr += strList[i+1] + " ";
     } else if (!findList[i].equals(replaceList[i])) {
-      String newPos = changePos(strList[i], findList[i], replaceList[i]);
+      String newPos = changePos(strList[i+1], findList[i], replaceList[i]);
       if (newPos != "") {
         replaceStr += newPos + " ";
       }
     } else {
-      replaceStr += strList[i] + " ";
+      replaceStr += strList[i+1] + " ";
     }
   }
   replaceStr = replaceStr.trim();
